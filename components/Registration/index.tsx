@@ -5,7 +5,6 @@ import Link from "next/link";
 import {useState} from 'react';
 import LoaderComponents from "@/components/Loader";
 import { useRouter } from "next/navigation";
-
 const RegisterComponents = ()=>{
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
@@ -13,8 +12,7 @@ const RegisterComponents = ()=>{
     const [password, setPassword] = useState("");
     const [error, setError] = useState("")
     const [loader, setLoader] = useState(false);
-    const router = useRouter();
-
+    const router  = useRouter();
     const userCreateAPI = async ()=>{
         try {
             setLoader(true)
@@ -30,7 +28,7 @@ const RegisterComponents = ()=>{
             if(res.ok){
                 setLoader(false)
                 alert("user created successfully !!")
-                router.push("/")
+                router.push('/')
             }else{
                 setLoader(false)
                 alert("user not create check api ")
