@@ -3,11 +3,12 @@
 import { signOut } from "next-auth/react";
 import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
-
+import LoaderComponents from "@/components/Loader";
 const DashBoardComponents = ()=>{
     const { data: session, update} = useSession();
     const [editInfo, setEdiInfo] = useState(false);
     const [name, setName]= useState("");
+    const [loader, setLoader] = useState(false);
     const [address, setAddress] = useState("");
     const infoUpdate = async (e)=>{
         e.preventDefault();
@@ -15,6 +16,7 @@ const DashBoardComponents = ()=>{
         
         if(editInfo){
             console.log('session',session, name,address)
+            setLoader(true)
             await update({
                 ...session,
                 user:{
@@ -23,6 +25,7 @@ const DashBoardComponents = ()=>{
                     address:address
                 }
             })
+            setLoader(false)
         }
     }
     useEffect(()=>{
@@ -31,6 +34,9 @@ const DashBoardComponents = ()=>{
     }, [session])
     return (
         <>
+        {
+            loader &&  <LoaderComponents />
+        }
             <div className="max-w-xl mx-auto mt-7 bg-white rounded-lg">
                 <div className="shadow-lg p-5 rounded-lg border-t-4 border-b-4 border-l-4 border-r-4 border-blue-500">
                     <h1 className="text-2xl mb-4 text-center">DashBoard user Info</h1>

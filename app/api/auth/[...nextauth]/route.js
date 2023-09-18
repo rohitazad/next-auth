@@ -3,7 +3,7 @@ import User from "@/models/user";
 import NextAuth from "next-auth/next";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
-import { getTokenSourceMapRange } from 'typescript';
+import { getTokenSourceMapRange } from "typescript";
 
 
 export const authOptions = {
@@ -28,7 +28,7 @@ export const authOptions = {
                     if(!passwordMatch){
                         return null;
                     }
-                    console.log('user', user)
+                    //console.log('user', user)
                     return user;
 
                 } catch (error) {
@@ -40,52 +40,51 @@ export const authOptions = {
             }
         })],
         callbacks:{
-            async jwt({token, user,session, trigger}){
-                console.log('trigger', trigger, 'session', session)
-                
-                if(trigger === 'update'){
-                    token.name = session.user.name,
-                    token.address = session.user.address
+              async jwt({token, user, session, trigger}){
 
+                if(trigger === 'update'){
+                    
+                    token.name = session.user.name // updarte tokcen 
+                    token.address = session.user.address // update 
                     await connectMongoDb();
                     const newUserInfo = await User.updateOne({
                         where:{
-                            id:token.id
+                            _id:token.id
                         },
-                        data:{
+                        $set:{
                             name:token.name,
                             address:token.address
                         }
-                    })
-                    console.log('newUserInfo',newUserInfo)
+                    }) 
+                    
                     await disconnectMongoDb();
-
-                    return {
-                        ...token, ...session.user
-                    }
+                    console.log('upate',newUserInfo, token, '____')
+                    return token
                 }
-                
+
                 if(user){
-                    return {
-                        ...token,
-                        id:user.id,
-                        address:user.address
-                    }
+                  return{
+                    ...token,
+                    id:user.id,
+                    address:user.address
+                  }
                 }
                 return token;
-            },
-            async session({token, session}){
-                //console.log('session token', token, 'session sessoin', session)
+              },
+              async session({token, user, session}){
                 return {
-                    ...session,
-                    user:{
-                        ...session.user,
-                        id:token.id,
-                        address:token.address,
-                        name:token.name
-                    }
-                };
-            }
+                  ...session,
+                  user:{
+                    ...session.user,
+                    id:token.id,
+                    address:token.address, // update session adress
+                    name:token.name // update sessin info
+                  }
+                }
+              }
+            },
+        session:{
+            strategy:"jwt",
         },
         secret: process.env.NEXTAUTH_SECRET,
         pages:{
