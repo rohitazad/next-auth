@@ -87,6 +87,9 @@ const LoginComponents = ()=>{
                         </Link>
                         
                     </div>
+                    <button className="bg-blue-500  text-white font-bold cursor-pointer px-6 py-4 w-full text-2xl" type="button" onClick={()=>{signIn('google')}}>Gooogle Sign In</button>
+
+                   
                 </div>
             </div>
         </>

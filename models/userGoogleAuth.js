@@ -6,14 +6,9 @@ const userSchema = new Schema({
         required:true
     },
     address:{
-        type:String,
-        required:true
+        type:String
     },
     email:{
-        type:String,
-        required:true
-    },
-    password:{
         type:String,
         required:true
     },
@@ -25,6 +20,6 @@ const userSchema = new Schema({
     timestamps:true
 })
 
-const User = models.User || mongoose.model("User", userSchema);
+const GoogleUser = models.GoogleUser || mongoose.model("GoogleUser", userSchema);
 
-export default User;
+export default GoogleUser;

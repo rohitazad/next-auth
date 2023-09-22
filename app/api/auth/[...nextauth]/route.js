@@ -1,9 +1,12 @@
 import {connectMongoDb, disconnectMongoDb} from '@/lib/mongodb';
 import User from "@/models/user";
+import GoogleUser from '@/models/userGoogleAuth';
 import NextAuth from "next-auth/next";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
-import { getTokenSourceMapRange } from "typescript";
+
+import GoogleProvider from "next-auth/providers/google";
+
 
 
 export const authOptions = {
@@ -38,11 +41,15 @@ export const authOptions = {
                 }
 
             }
-        })],
+        }),
+        GoogleProvider({
+            clientId:process.env.GOOGLE_CLIENT_ID,
+            clientSecret:process.env.GOOGLE_CLIENT_SECRET
+        }),
+        ],
         callbacks:{
-              async jwt({token, user, session, trigger}){
-
-                if(trigger === 'update'){
+            async jwt({token, user, session, trigger}){
+                 if(trigger === 'update'){
                     
                     token.name = session.user.name // updarte tokcen 
                     token.address = session.user.address // update 
@@ -71,6 +78,22 @@ export const authOptions = {
                 }
                 return token;
               },
+              async signIn({profile, account}){
+                //console.log('profile', profile, account);
+                if(account.provider === 'google'){
+                   await connectMongoDb();
+                   const userExits = await GoogleUser.findOne({email:profile.email}).select("_id")
+                   if(!userExits){
+                        const user = await GoogleUser.create({
+                            email:profile.email,
+                            name:profile.name,
+                            image:profile.picture
+                        })
+                   }
+                   await disconnectMongoDb();
+                }
+                return true
+              },
               async session({token, user, session}){
                 return {
                   ...session,
@@ -82,6 +105,7 @@ export const authOptions = {
                   }
                 }
               }
+              
             },
         session:{
             strategy:"jwt",
@@ -89,7 +113,8 @@ export const authOptions = {
         secret: process.env.NEXTAUTH_SECRET,
         pages:{
             signIn: "/"
-        }
+        },
+        
 }
 const handler = NextAuth(authOptions)
 
