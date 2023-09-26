@@ -5,7 +5,8 @@ import Link from "next/link";
 import {useState} from 'react';
 import {signIn} from "next-auth/react";
 import { useRouter } from "next/navigation";
-
+import Image from "next/image";
+import imageLink from '@/public/google-signin-button.png';
 
 const LoginComponents = ()=>{
     const [email, setEmail] = useState("")
@@ -87,9 +88,18 @@ const LoginComponents = ()=>{
                         </Link>
                         
                     </div>
-                    <button className="bg-blue-500  text-white font-bold cursor-pointer px-6 py-4 w-full text-2xl" type="button" onClick={()=>{signIn('google')}}>Gooogle Sign In</button>
-
-                   
+                    <div className="text-center font-bold text-2xl">
+                        OR
+                    </div>
+                    <div className="text-center mt-2">
+                        <Image
+                            className="inline-block cursor-pointer"
+                            onClick={()=>{signIn('google')}}
+                            src={imageLink}
+                            width={300} 
+                            height={50}
+                            alt="Googel"/>
+                    </div>
                 </div>
             </div>
         </>
