@@ -5,7 +5,8 @@ import Link from "next/link";
 import {useState} from 'react';
 import {signIn} from "next-auth/react";
 import { useRouter } from "next/navigation";
-
+import Image from "next/image";
+import imageLink from '@/public/google-signin-button.png';
 
 const LoginComponents = ()=>{
     const [email, setEmail] = useState("")
@@ -86,6 +87,18 @@ const LoginComponents = ()=>{
                             Do not have an account ? <span className="underline">Register</span>    
                         </Link>
                         
+                    </div>
+                    <div className="text-center font-bold text-2xl">
+                        OR
+                    </div>
+                    <div className="text-center mt-2">
+                        <Image
+                            className="inline-block cursor-pointer"
+                            onClick={()=>{signIn('google')}}
+                            src={imageLink}
+                            width={300} 
+                            height={50}
+                            alt="Googel"/>
                     </div>
                 </div>
             </div>

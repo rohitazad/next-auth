@@ -3,7 +3,9 @@ import User from "@/models/user";
 import NextAuth from "next-auth/next";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
-import { getTokenSourceMapRange } from "typescript";
+
+import GoogleProvider from "next-auth/providers/google";
+
 
 
 export const authOptions = {
@@ -28,7 +30,7 @@ export const authOptions = {
                     if(!passwordMatch){
                         return null;
                     }
-                    //console.log('user', user)
+                    console.log('user', user)
                     return user;
 
                 } catch (error) {
@@ -38,28 +40,33 @@ export const authOptions = {
                 }
 
             }
-        })],
+        }),
+        GoogleProvider({
+            clientId:process.env.GOOGLE_CLIENT_ID,
+            clientSecret:process.env.GOOGLE_CLIENT_SECRET
+        }),
+        ],
         callbacks:{
-              async jwt({token, user, session, trigger}){
-
-                if(trigger === 'update'){
-                    
-                    token.name = session.user.name // updarte tokcen 
-                    token.address = session.user.address // update 
+            async jwt({token, user, session, trigger}){
+                 if(trigger === 'update'){
+                    const newToken = { ...token };
+                    newToken.name = session.user.name;
+                    newToken.address = session.user.address; 
+                     console.log('___sessionnewToken',newToken);
                     await connectMongoDb();
                     const newUserInfo = await User.updateOne({
                         where:{
-                            _id:token.id
+                            _id:newToken.id
                         },
                         $set:{
-                            name:token.name,
-                            address:token.address
+                            name:newToken.name,
+                            address:newToken.address
                         }
                     }) 
                     
                     await disconnectMongoDb();
-                    console.log('upate',newUserInfo, token, '____')
-                    return token
+                    console.log('upate',newUserInfo, newToken, '____')
+                    return newToken
                 }
 
                 if(user){
@@ -70,6 +77,23 @@ export const authOptions = {
                   }
                 }
                 return token;
+              },
+              async signIn({profile, account}){
+                console.log('profile', profile, account);
+                if(account.provider === 'google'){
+                   await connectMongoDb();
+                   const userExits = await User.findOne({email:profile.email}).select("_id")
+                   if(!userExits){
+                        const user = await User.create({
+                            email:profile.email,
+                            name:profile.name,
+                            image:profile.picture,
+                            address:''
+                        })
+                   }
+                   await disconnectMongoDb();
+                }
+                return true
               },
               async session({token, user, session}){
                 return {
@@ -82,6 +106,7 @@ export const authOptions = {
                   }
                 }
               }
+              
             },
         session:{
             strategy:"jwt",
@@ -89,7 +114,8 @@ export const authOptions = {
         secret: process.env.NEXTAUTH_SECRET,
         pages:{
             signIn: "/"
-        }
+        },
+        
 }
 const handler = NextAuth(authOptions)
 

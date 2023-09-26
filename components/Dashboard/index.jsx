@@ -30,7 +30,7 @@ const DashBoardComponents = ()=>{
     }
     useEffect(()=>{
         setName(session?.user?.name)
-        setAddress(session?.user?.address)
+        setAddress(session?.user?.address || '')
     }, [session])
     return (
         <>

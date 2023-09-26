@@ -6,16 +6,17 @@ const userSchema = new Schema({
         required:true
     },
     address:{
-        type:String,
-        required:true
+        type:String
     },
     email:{
         type:String,
         required:true
     },
     password:{
-        type:String,
-        required:true
+        type:String
+    },
+    image:{
+        type:String
     }
 },
 {
