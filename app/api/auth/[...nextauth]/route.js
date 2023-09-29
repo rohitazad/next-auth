@@ -5,7 +5,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 
 import GoogleProvider from "next-auth/providers/google";
-
+import GitHubProvider from "next-auth/providers/github"
 
 
 export const authOptions = {
@@ -45,6 +45,10 @@ export const authOptions = {
             clientId:process.env.GOOGLE_CLIENT_ID,
             clientSecret:process.env.GOOGLE_CLIENT_SECRET
         }),
+        GitHubProvider({
+            clientId:process.env.GITHUB_CLIENT_ID,
+            clientSecret:process.env.GITHUB_CLIENT_SECRET
+        })
         ],
         callbacks:{
             async jwt({token, user, session, trigger}){
@@ -93,6 +97,19 @@ export const authOptions = {
                    }
                    await disconnectMongoDb();
                 }
+                if(account.provider === 'github'){
+                    await connectMongoDb();
+                    const userExits = await User.findOne({email:profile.email}).select("_id")
+                    if(!userExits){
+                         const user = await User.create({
+                             email:profile.email,
+                             name:profile.name,
+                             image:profile.avatar_url,
+                             address:profile.location
+                         })
+                    }
+                    await disconnectMongoDb();
+                 }
                 return true
               },
               async session({token, user, session}){

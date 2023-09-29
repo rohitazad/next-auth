@@ -7,6 +7,7 @@ import {signIn} from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import imageLink from '@/public/google-signin-button.png';
+import GitHubImage from "@/public/signInWithGithub.png";
 
 const LoginComponents = ()=>{
     const [email, setEmail] = useState("")
@@ -99,6 +100,15 @@ const LoginComponents = ()=>{
                             width={300} 
                             height={50}
                             alt="Googel"/>
+                    </div>
+                    <div className="text-center mt-2">
+                        <Image
+                            className="inline-block cursor-pointer"
+                            onClick={()=>{signIn('github')}}
+                            src={GitHubImage}
+                            width={300} 
+                            height={50}
+                            alt="github"/>
                     </div>
                 </div>
             </div>
